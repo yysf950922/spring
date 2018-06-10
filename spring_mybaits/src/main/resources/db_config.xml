@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <!--导入数据库连接配置文件-->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+    <!-- destroy-method="close" 当数据库连接不使用的时候,就把该连接重新放到数据池中,方便下次使用调用.-->
+    <bean id="dataSource" class="com.alibaba.druid.pool.DruidDataSource" destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <!--连接池最大连接数-->
+        <property name="maxActive" value="${maxActive}"/>
+        <!--数据库最大空闲数-->
+        <property name="maxIdle" value="${maxIdle}"/>
+    </bean>
+
+
+    <!--配置sqlsessionFactory-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!-- 引入数据源 -->
+        <property name="dataSource" ref="dataSource1"></property>
+        <!-- 加载mybatis配置文件-->
+    </bean>
+
+    <!--
+            使用mapper扫描器创建mapper代理对象
+            扫描器把包下的mapper扫描出来创建代理对象在spring容器中注册，bean的id为类的首字母小写
+    -->
+    <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer" >
+        <!-- 指定要扫描的包路径，如果要扫描多个包，中间使用半角逗号分隔
+           注意：如果使用扫描器，不需要在sqlMapConfig.xml中加载mapper，要将mapper.xml和mapper.java放在同一个目录且同名
+    -->
+        <property name="basePackage" value="cn.itcast.ssm.mapper"></property>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
+    </bean>
+
+</beans>
